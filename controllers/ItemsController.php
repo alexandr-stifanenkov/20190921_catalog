@@ -117,12 +117,123 @@ class ItemsController extends Controller
     }
 
     /**
-     * Displays about page.
+     * Displays item page.
      *
      * @return string
      */
     public function actionItem($id)
     {
-        return $this->render('item', ['itemId' => $id]);
+        //Возвращает все записи в виде ассоциативного массива
+//        $query = 'SELECT * FROM `menu` ORDER BY type, pos';
+//
+//        $menu = Yii::$app->db->createCommand($query)
+//            ->queryAll();
+
+        // Возвращает только одну колонку, но из всех строк
+//        $query = 'SELECT name FROM `menu` ORDER BY type, pos';
+//
+//        $menu = Yii::$app->db->createCommand($query)
+//            ->queryColumn();
+
+        // Возвращает одну строку в виде ассоциативного массива
+//        $query = 'SELECT * FROM `menu` ORDER BY type, pos';
+//        $menu = Yii::$app->db->createCommand($query)
+//            ->queryOne();
+
+        // Возвращает одно скалярное значение
+//        $query = 'SELECT COUNT(*) FROM `menu`';
+//        $menu = Yii::$app->db->createCommand($query)
+//            ->queryScalar();
+
+        $query = 'SELECT * FROM `menu` WHERE type=:typeId AND pos=:pos ORDER BY type, pos';
+
+        $pos = 10;
+        $command = Yii::$app->db->createCommand($query)
+            ->bindParam(':typeId', $id)
+            ->bindParam(':pos', $pos);
+//            ->bindValues([
+//                ':typeId' => $id,
+//                ':pos' => $pos,
+//            ]);
+
+        $menu = $command->queryAll();
+
+        echo '<pre>';
+        print_r($menu);
+        echo '</pre>';
+
+        $pos = 20;
+        $menu = $command->queryAll();
+
+        echo '<pre>';
+        print_r($menu);
+        echo '</pre>';
+
+
+//        return $this->render('item', ['itemId' => $id]);
+    }
+
+    public function actionDo()
+    {
+//        $result = Yii::$app->db
+//            ->createCommand()
+//            ->insert(
+//                'menu',
+//                [
+//                    'type' => 3,
+//                    'name' => 'Тест',
+//                    'pos' => 10
+//                ]
+//            )
+//            ->execute();
+
+//        $query = 'UPDATE `menu` SET `name` = "Новое название" WHERE id=10';
+//        $result = Yii::$app->db
+//            ->createCommand($query)
+//            ->execute();
+
+//        $result = Yii::$app->db->createCommand()
+//            ->update(
+//                'menu',
+//                [
+//                    'name' => 'New name'
+//                ],
+//                'id = 10'
+//            )
+//            ->execute();
+
+        $result = Yii::$app->db->createCommand()
+            ->delete(
+                'menu',
+                'id = 10'
+            )
+            ->execute();
+
+        var_dump($result);
+        die;
+    }
+
+    public function actionQb()
+    {
+        // Query Builder - построитель запросов
+        $query = (new \yii\db\Query())
+            ->select('id, name')
+            ->from('items')
+            ->where('id > 2')
+            ->limit(5);
+
+        $query->andWhere('id < 5');
+        $query->orWhere('id = 1');
+
+//        echo $query->createCommand()->sql;
+
+        $data = $query->all();
+
+        return $this->asJson($data);
+
+        echo '<pre>';
+        print_r($data);
+        echo '</pre>';
+        die;
     }
 }
