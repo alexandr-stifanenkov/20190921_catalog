@@ -9,6 +9,7 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\models\Category;
 
 class ItemsController extends Controller
 {
@@ -213,26 +214,139 @@ class ItemsController extends Controller
         die;
     }
 
+    /**
+     * Работа с Query Builder
+     */
     public function actionQb()
     {
         // Query Builder - построитель запросов
-        $query = (new \yii\db\Query())
-            ->select('id, name')
-            ->from('items')
-            ->where('id > 2')
-            ->limit(5);
+//        $query = (new \yii\db\Query())
+//            ->select('id, name')
+//            ->from('items')
+//            ->where('id > 2')
+//            ->limit(5);
+//
+//        $query->andWhere('id < 5');
+//        $query->orWhere('id = 1');
+//
+////        echo $query->createCommand()->sql;
+//
+//        $data = $query->all();
 
-        $query->andWhere('id < 5');
-        $query->orWhere('id = 1');
-
+        // Массивы в качестве аргументов
+//        $idsList = [1, 3, 5, 7];
+//        $catIds = [1, 2];
+//
+//        $query = (new \yii\db\Query())
+//            ->select('*')
+//            ->from('items')
+//            ->where([
+//                'id' => $idsList,
+//                'category_id' => $catIds
+//            ])
+//            ->andWhere('collection_id = :collId', [':collId' => 2]);
+//
 //        echo $query->createCommand()->sql;
+//
+//        $data = $query->all();
 
+//        return $this->asJson($data);
+
+//        $subquery = (new \yii\db\Query())
+//            ->select('item_id')
+//            ->from('items_sizes')
+//            ->where(['size_id' => 4]);
+//
+//        $query = (new \yii\db\Query())
+//            ->select('*')
+//            ->from('items')
+//            ->where(['id' => $subquery]);
+//
+//        echo $query->createCommand()->sql;
+//
+//        $data = $query->all();
+
+        // HAVING
+//        $itemIds = (new \yii\db\Query())
+//            ->select('item_id')
+//            ->from('items_sizes')
+//            ->where(['size_id' => 4])
+//            ->column();
+//
+//        $query = (new \yii\db\Query())
+//            ->select('*')
+//            ->from('items')
+//            ->where(['id' => $itemIds])
+//            ->having('id > 2');
+
+        // SELECT items.* FROM `items`
+        // JOIN items_sizes ON items.id = items_sizes.item_id
+        // WHERE items_sizes.size_id = 4
+
+        // JOIN, ORDER BY
+        $query = (new \yii\db\Query())
+            ->select('items.*')
+            ->from('items')
+            ->join('JOIN', 'items_sizes', 'items.id = items_sizes.item_id')
+            ->where('items_sizes.size_id = 4')
+            ->orderBy('items.name DESC')
+//            ->indexBy('price');
+            ->indexBy(function($row) {
+                return $row['id'] . '_' . $row['category_id'] . '_' . $row['collection_id'];
+            });
+
+        echo $query->createCommand()->sql;
+
+        // Выбирает все записи
         $data = $query->all();
 
-        return $this->asJson($data);
+//        // Плоский массив из значений первого столбца
+//        $data = $query->column();
+//
+//        // Только первая запись
+//        $data = $query->one();
+//
+//        // Количество записей
+//        $data = $query->count(); // возвращает int
+//
+//        // Существуют ли записи
+//        $data = $query->exists(); // возвращает bool
 
         echo '<pre>';
         print_r($data);
+        echo '</pre>';
+        die;
+    }
+
+    /**
+     * Работа с Active Record
+     */
+    public function actionAr()
+    {
+//        $categories = Category::findAll([1, 2, 3]);
+
+//        echo $categories[0]->whatIsIt() . '<br>';
+//        $categories[0]->name = 'Новое имя';
+
+//        $categories = Category::find()
+//            ->where('pos < 30')
+//            ->asArray()
+//            ->one();
+
+//        $category = Category::findOne(2);
+
+        $category = Category::findBySql('SELECT * FROM categories WHERE id=2')->one();
+
+        $category->name = 'New';
+
+        // Создание новой записи
+//        $category = new Category();
+//        $category->name = 'Новая категория';
+//        $category->pos = 40;
+//        $category->save();
+
+        echo '<pre>';
+        print_r($category);
         echo '</pre>';
         die;
     }
