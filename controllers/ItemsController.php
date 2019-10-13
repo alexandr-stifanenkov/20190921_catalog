@@ -10,6 +10,7 @@ use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\Category;
+use app\models\Item;
 
 class ItemsController extends Controller
 {
@@ -323,31 +324,24 @@ class ItemsController extends Controller
      */
     public function actionAr()
     {
-//        $categories = Category::findAll([1, 2, 3]);
+        $item = Item::findOne(1);
 
-//        echo $categories[0]->whatIsIt() . '<br>';
-//        $categories[0]->name = 'Новое имя';
+        return $this->render('show', ['item' => $item]);
+    }
 
-//        $categories = Category::find()
-//            ->where('pos < 30')
-//            ->asArray()
-//            ->one();
+    public function actionNocatsizes()
+    {
+        $this->actionSizes(1);
+    }
 
-//        $category = Category::findOne(2);
+    public function actionSizes($categoryId)
+    {
+        $sizes = \app\models\Size::find()
+            ->withCategory($categoryId)
+            ->orderBy('pos')
+            ->asArray()
+            ->all();
 
-        $category = Category::findBySql('SELECT * FROM categories WHERE id=2')->one();
-
-        $category->name = 'New';
-
-        // Создание новой записи
-//        $category = new Category();
-//        $category->name = 'Новая категория';
-//        $category->pos = 40;
-//        $category->save();
-
-        echo '<pre>';
-        print_r($category);
-        echo '</pre>';
-        die;
+        return $this->asJson($sizes);
     }
 }
