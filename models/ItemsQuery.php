@@ -2,6 +2,8 @@
 
 namespace app\models;
 
+use yii\db\Query;
+
 /**
  * This is the ActiveQuery class for [[Item]].
  *
@@ -9,26 +11,14 @@ namespace app\models;
  */
 class ItemsQuery extends \yii\db\ActiveQuery
 {
-    /*public function active()
+    public function bySize($sizeId)
     {
-        return $this->andWhere('[[status]]=1');
-    }*/
+        $subquery = (new \yii\db\Query())
+            ->select('item_id')
+            ->from('items_sizes')
+            ->where(['size_id' => $sizeId]);
 
-    /**
-     * {@inheritdoc}
-     * @return Item[]|array
-     */
-    public function all($db = null)
-    {
-        return parent::all($db);
-    }
-
-    /**
-     * {@inheritdoc}
-     * @return Item|array|null
-     */
-    public function one($db = null)
-    {
-        return parent::one($db);
+        return $this
+            ->andWhere(['id' => $subquery]);
     }
 }

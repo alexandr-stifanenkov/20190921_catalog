@@ -9,26 +9,21 @@ namespace app\models;
  */
 class MenuQuery extends \yii\db\ActiveQuery
 {
-    /*public function active()
+    public function headerMenu()
     {
-        return $this->andWhere('[[status]]=1');
-    }*/
-
-    /**
-     * {@inheritdoc}
-     * @return Menu[]|array
-     */
-    public function all($db = null)
-    {
-        return parent::all($db);
+        return $this
+            ->where(['type' => 0])
+            ->orderBy('pos')
+            ->asArray()
+            ->all();
     }
 
-    /**
-     * {@inheritdoc}
-     * @return Menu|array|null
-     */
-    public function one($db = null)
+    public function footerMenu()
     {
-        return parent::one($db);
+        return $this
+            ->where(['type' => 1])
+            ->orderBy('pos')
+            ->asArray()
+            ->all();
     }
 }
